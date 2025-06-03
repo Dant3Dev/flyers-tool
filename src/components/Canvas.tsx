@@ -10,7 +10,17 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [canvas, setCanvas] = useState<fabric.Canvas | null>(null)
     const canvasContainerRef = useRef<null | HTMLDivElement>(null)
-    const [selectedObjectCoords, setSelectedObjectCoords] = useState({ x: 0, y: 0 })
+    const [relativeObjectCoords, setRelativeObjectCoords] = useState({ x: 0, y: 0 })
+
+    const calculatedCoord = (x: number, y: number) => {
+        const height = canvasContainerRef.current?.clientHeight || 1
+        const width = canvasContainerRef.current?.clientWidth || 1
+
+        const scaleX = width / (width - x)
+        const scaleY = height / (height - y)
+
+        return { x: Number(scaleX.toFixed(2)), y: Number(scaleY.toFixed(2)) }
+    }
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -27,26 +37,26 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
             fabricCanvas.on('selection:created', (e) => {
                 const obj = e.selected?.[0]
                 if (obj) {
-                    setSelectedObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
+                    setRelativeObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
                 }
             })
 
             fabricCanvas.on('selection:updated', (e) => {
                 const obj = e.selected?.[0]
                 if (obj) {
-                    setSelectedObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
+                    setRelativeObjectCoords(calculatedCoord((obj.left || 0), Math.round(obj.top || 0)))
                 }
             })
 
             fabricCanvas.on('object:moving', (e) => {
                 const obj = e.target
                 if (obj) {
-                    setSelectedObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
+                    setRelativeObjectCoords(calculatedCoord((obj.left || 0), Math.round(obj.top || 0)))
                 }
             })
 
             fabricCanvas.on('selection:cleared', () => {
-                setSelectedObjectCoords({ x: 0, y: 0 })
+                setRelativeObjectCoords({ x: 0, y: 0 })
             })
 
             return () => {
@@ -85,7 +95,9 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 top: 50,
                 fontFamily: 'Arial',
                 fontSize: 24,
-                fill: '#000000'
+                fill: '#000000',
+                originX: 'center',
+                originY: 'center'
             })
             textObject.setControlsVisibility({
                 mt: false,
@@ -107,7 +119,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 onChange={handleImageUpload}
                 className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
-            <TextControls onAddText={handleAddText} coordinates={selectedObjectCoords} />
+            <TextControls onAddText={handleAddText} coordinates={relativeObjectCoords} />
             <div ref={canvasContainerRef} className='flex justify-center relative rounded-lg overflow-hidden h-[calc(90vw/0.75)] md:max-h-[792px] md:h-[46vw] lg:h-[35vw] md:max-w-[calc((792px/4)*3)] md:w-[calc(46vw*0.75)] lg:w-[calc(35vw*0.75)] max-h-[495px] w-[90vw]'>
                 <canvas ref={canvasRef} />
             </div>
