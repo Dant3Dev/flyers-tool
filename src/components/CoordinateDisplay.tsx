@@ -37,7 +37,7 @@ export default function CoordinateDisplay({ x, y, s }: CoordinateDisplayProps) {
         <span className='w-[12rem]'>
           {`[${x}, ${y}, ${s}]`}
         </span>
-        <CopyCoordinatesButton coords={[x, y, 0]} />
+        <CopyCoordinatesButton coords={[x, y, s]} />
       </div>
     </div>
   )

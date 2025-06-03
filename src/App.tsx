@@ -8,7 +8,7 @@ function App() {
   }
 
   return (
-    <div className=' h-full flex flex-col gap-10'>
+    <div className=' h-full flex flex-col gap-10 dark'>
       <h1>Flyers Tool</h1>
       <Canvas onImageUpload={handleImageUpload} />
     </div>

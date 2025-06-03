@@ -1,10 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { fabric } from 'fabric'
 import TextControls from './TextControls'
+import { cn } from '../lib/utils'
+import { Switch } from './ui/switch'
 
 interface CanvasProps {
     onImageUpload?: (file: File) => void
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const canvasStyleFormats: any = {
+    whatsappPost: 'h-[calc(90vw/0.82)] md:max-h-[792px] md:h-[46vw] lg:h-[35vw] md:max-w-[calc((792px/4)*3)] md:w-[calc(46vw*0.82)] lg:w-[calc(35vw*0.82)] max-h-[495px] w-[90vw]',
+    igStory: 'h-[calc(60svw/0.58)] md:max-h-[792px]  md:h-[46vw] lg:h-[35vw] md:max-w-[calc(792px/4)*3] md:w-[calc(46vw*0.58)] lg:w-[calc(35vw*0.58)] max-h-[495px] w-[60svw]'
+}
+
 
 export default function Canvas({ onImageUpload }: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -12,6 +21,9 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
     const canvasContainerRef = useRef<null | HTMLDivElement>(null)
     const [relativeObjectCoords, setRelativeObjectCoords] = useState({ x: 0, y: 0 })
     const [selectedTextFontSize, setSelectedTextFontSize] = useState<number | null>(null)
+
+    const [canvasStyle, setCanvasStyle] = useState(canvasStyleFormats.whatsappPost)
+
 
     const calculatedCoord = (x: number, y: number) => {
         const height = canvasContainerRef.current?.clientHeight || 1
@@ -25,10 +37,10 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
 
     const calculateFontSize = (fontSize: number) => {
         const height = canvasContainerRef.current?.clientHeight || 1
-        const calculatedSize = height/ fontSize
+        const calculatedSize = height / fontSize
         return Math.round(calculatedSize)
     }
-        
+
 
     useEffect(() => {
         let fabricCanvas: fabric.Canvas | null = null
@@ -44,7 +56,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
 
             // Add event listeners for object selection and movement
             fabricCanvas.on('selection:created', (e) => {
-                const obj= e.selected?.[0] as fabric.Text
+                const obj = e.selected?.[0] as fabric.Text
                 if (obj) {
                     setRelativeObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
                     if (obj.type === 'text') {
@@ -83,7 +95,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 const obj = e.target as fabric.Text
                 if (obj && obj.type === 'text') {
                     // fontSize is scaled by scaleY (or scaleX if you want horizontal scaling)
-                    const textObj = obj as fabric.Text;
+                    const textObj = obj as fabric.Text
                     const newFontSize = (textObj.fontSize || 0) * (textObj.scaleY || 1)
                     obj.set({ fontSize: Math.round(newFontSize) })
                     setSelectedTextFontSize(calculateFontSize(Math.round(newFontSize)))
@@ -114,7 +126,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 if (fabricCanvas) fabricCanvas.dispose()
             }
         }
-    }, [])
+    }, [canvasStyle])
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
@@ -146,7 +158,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 top: 50,
                 fontFamily: 'Arial',
                 fontSize: 24,
-                fill: '#000000',
+                fill: '#6aff00',
                 originX: 'center',
                 originY: 'center',
                 scaleY: 1,
@@ -163,8 +175,19 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
         }
     }
 
+    const handleSwitchChange = (checked: boolean) => {
+        setCanvasStyle(checked ? canvasStyleFormats.igStory : canvasStyleFormats.whatsappPost)
+    }
+
+    console.log(canvasStyle)
+
     return (
         <div className='flex flex-col gap-4 items-center'>
+            <div className="flex items-center gap-2">
+                <span className="text-sm">WhatsApp Post</span>
+                <Switch className='bg-red-500' checked={canvasStyle === canvasStyleFormats.igStory} onCheckedChange={handleSwitchChange} />
+                <span className="text-sm">IG Story</span>
+            </div>
             <input
                 type="file"
                 accept="image/*"
@@ -172,7 +195,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
             <TextControls onAddText={handleAddText} coordinates={relativeObjectCoords} fontSize={selectedTextFontSize} />
-            <div ref={canvasContainerRef} className='flex justify-center relative rounded-lg overflow-hidden h-[calc(90vw/0.75)] md:max-h-[792px] md:h-[46vw] lg:h-[35vw] md:max-w-[calc((792px/4)*3)] md:w-[calc(46vw*0.75)] lg:w-[calc(35vw*0.75)] max-h-[495px] w-[90vw]'>
+            <div key={canvasStyle} ref={canvasContainerRef} className={cn('flex justify-center relative rounded-lg overflow-hidden', canvasStyle)}>
                 <canvas ref={canvasRef} />
             </div>
         </div>
