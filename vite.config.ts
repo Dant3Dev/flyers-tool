@@ -8,4 +8,5 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  base: '/flyers-tool/',  // Replace with your actual repo name
 })
