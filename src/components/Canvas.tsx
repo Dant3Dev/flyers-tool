@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fabric } from 'fabric'
+import TextControls from './TextControls'
 
 interface CanvasProps {
     onImageUpload?: (file: File) => void
@@ -9,7 +10,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [canvas, setCanvas] = useState<fabric.Canvas | null>(null)
     const canvasContainerRef = useRef<null | HTMLDivElement>(null)
-    const [textInput, setTextInput] = useState('')
+    const [selectedObjectCoords, setSelectedObjectCoords] = useState({ x: 0, y: 0 })
 
     useEffect(() => {
         if (canvasRef.current) {
@@ -21,6 +22,32 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
 
             fabric.textureSize = 65536
             setCanvas(fabricCanvas)
+
+            // Add event listeners for object selection and movement
+            fabricCanvas.on('selection:created', (e) => {
+                const obj = e.selected?.[0]
+                if (obj) {
+                    setSelectedObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
+                }
+            })
+
+            fabricCanvas.on('selection:updated', (e) => {
+                const obj = e.selected?.[0]
+                if (obj) {
+                    setSelectedObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
+                }
+            })
+
+            fabricCanvas.on('object:moving', (e) => {
+                const obj = e.target
+                if (obj) {
+                    setSelectedObjectCoords({ x: Math.round(obj.left || 0), y: Math.round(obj.top || 0) })
+                }
+            })
+
+            fabricCanvas.on('selection:cleared', () => {
+                setSelectedObjectCoords({ x: 0, y: 0 })
+            })
 
             return () => {
                 fabricCanvas.dispose()
@@ -51,31 +78,24 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
         canvas?.requestRenderAll()
     }
 
-    const addTextToCanvas = () => {
-        if (canvas && textInput.trim()) {
-            const text = new fabric.Text(textInput, {
+    const handleAddText = (text: string) => {
+        if (canvas && text.trim()) {
+            const textObject = new fabric.Text(text, {
                 left: 50,
                 top: 50,
                 fontFamily: 'Arial',
                 fontSize: 24,
                 fill: '#000000'
             })
-            text.setControlsVisibility({
+            textObject.setControlsVisibility({
                 mt: false,
                 mb: false,
                 ml: false,
                 mr: false,
             })
-            canvas.add(text)
-            canvas.setActiveObject(text)
+            canvas.add(textObject)
+            canvas.setActiveObject(textObject)
             canvas.renderAll()
-            setTextInput('')
-        }
-    }
-
-    const handleTextInputKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            addTextToCanvas()
         }
     }
 
@@ -87,23 +107,7 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
                 onChange={handleImageUpload}
                 className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
-            <div className='flex gap-2 items-center'>
-                <input
-                    type="text"
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    onKeyPress={handleTextInputKeyPress}
-                    placeholder="Enter text to add to canvas"
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                    onClick={addTextToCanvas}
-                    disabled={!textInput.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
-                    Add Text
-                </button>
-            </div>
+            <TextControls onAddText={handleAddText} coordinates={selectedObjectCoords} />
             <div ref={canvasContainerRef} className='flex justify-center relative rounded-lg overflow-hidden h-[calc(90vw/0.75)] md:max-h-[792px] md:h-[46vw] lg:h-[35vw] md:max-w-[calc((792px/4)*3)] md:w-[calc(46vw*0.75)] lg:w-[calc(35vw*0.75)] max-h-[495px] w-[90vw]'>
                 <canvas ref={canvasRef} />
             </div>
