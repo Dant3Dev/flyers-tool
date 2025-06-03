@@ -4,9 +4,10 @@ import CoordinateDisplay from './CoordinateDisplay'
 interface TextControlsProps {
   onAddText: (text: string) => void
   coordinates: { x: number; y: number }
+  fontSize?: number | null
 }
 
-export default function TextControls({ onAddText, coordinates }: TextControlsProps) {
+export default function TextControls({ onAddText, coordinates, fontSize }: TextControlsProps) {
   const [textInput, setTextInput] = useState('')
 
   const handleAddText = () => {
@@ -41,7 +42,7 @@ export default function TextControls({ onAddText, coordinates }: TextControlsPro
           Add Text
         </button>
       </div>
-      <CoordinateDisplay x={coordinates.x} y={coordinates.y} />
+      <CoordinateDisplay s={fontSize || 0} x={coordinates.x} y={coordinates.y} />
     </div>
   )
 }
