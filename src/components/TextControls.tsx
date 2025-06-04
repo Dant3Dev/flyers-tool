@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import CoordinateDisplay from './CoordinateDisplay'
+import { Input } from './ui/input'
+import { Button } from './ui/button'
 
 interface TextControlsProps {
   onAddText: (text: string) => void
@@ -24,9 +26,9 @@ export default function TextControls({ onAddText, coordinates, fontSize }: TextC
   }
 
   return (
-    <div className='flex flex-col gap-4 items-center'>
-      <div className='flex gap-2 items-center'>
-        <input
+    <div className='flex flex-col gap-4 items-center w-[30rem]'>
+      <div className='flex gap-2 items-center w-full'>
+        <Input
           type="text"
           value={textInput}
           onChange={(e) => setTextInput(e.target.value)}
@@ -34,13 +36,12 @@ export default function TextControls({ onAddText, coordinates, fontSize }: TextC
           placeholder="Enter text to add to canvas"
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button
+        <Button
           onClick={handleAddText}
           disabled={!textInput.trim()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           Add Text
-        </button>
+        </Button>
       </div>
       <CoordinateDisplay s={fontSize || 0} x={coordinates.x} y={coordinates.y} />
     </div>

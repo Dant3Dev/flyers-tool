@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from './ui/button'
 
 interface CopyCoordinatesButtonProps {
   coords: number[];
@@ -18,14 +19,13 @@ const CopyCoordinatesButton: React.FC<CopyCoordinatesButtonProps> = ({ coords })
   };
 
   return (
-    <button
+    <Button
       type="button"
-      className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs border border-blue-700"
       onClick={handleCopy}
       aria-label="Copy coordinates array"
     >
       {copied ? 'Copied!' : 'Copy'}
-    </button>
+    </Button>
   );
 };
 

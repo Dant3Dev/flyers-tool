@@ -5,36 +5,37 @@ interface CoordinateDisplayProps {
 }
 
 import CopyCoordinatesButton from './CopyCoordinatesButton';
+import { Input } from './ui/input'
 
 export default function CoordinateDisplay({ x, y, s }: CoordinateDisplayProps) {
   return (
-    <div className="flex flex-col gap-2 items-center">
+    <div className="flex flex-col gap-2 items-center w-full">
       <div className='flex gap-2 items-center'>
         <label className="text-sm font-medium">X:</label>
-        <input
+        <Input
           type="number"
           value={x}
           readOnly
-          className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-gray-50 text-sm text-black"
+          className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-gray-50 text-sm text-white"
         />
         <label className="text-sm font-medium">Y:</label>
-        <input
+        <Input
           type="number"
           value={y}
           readOnly
-          className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-gray-50 text-sm text-black"
+          className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-gray-50 text-sm text-white"
         />
         <label className="text-sm font-medium">S:</label>
-        <input
+        <Input
           type="number"
           value={s}
           readOnly
-          className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-gray-50 text-sm text-black"
+          className="w-20 px-2 py-1 border border-gray-300 rounded-md bg-gray-50 text-sm text-white"
         />
       </div>
-      <div className="bg-gray-700 p-2 rounded-md w-[32rem] flex gap-2 justify-center items-center">
-        <label className="text-sm font-medium">Coordinates Array: </label>
-        <span className='w-[12rem]'>
+      <div className=" bg-slate-700 p-2 rounded-md w-full flex gap-2 justify-center items-center">
+        <label className="text-sm font-medium text-white">Coordinates Array: </label>
+        <span className='w-[12rem] text-white'>
           {`[${x}, ${y}, ${s}]`}
         </span>
         <CopyCoordinatesButton coords={[x, y, s]} />

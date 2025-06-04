@@ -3,6 +3,8 @@ import { fabric } from 'fabric'
 import TextControls from './TextControls'
 import { cn } from '../lib/utils'
 import { Switch } from './ui/switch'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
 
 interface CanvasProps {
     onImageUpload?: (file: File) => void
@@ -179,21 +181,22 @@ export default function Canvas({ onImageUpload }: CanvasProps) {
         setCanvasStyle(checked ? canvasStyleFormats.igStory : canvasStyleFormats.whatsappPost)
     }
 
-    console.log(canvasStyle)
-
     return (
         <div className='flex flex-col gap-4 items-center'>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
                 <span className="text-sm">WhatsApp Post</span>
-                <Switch className='bg-red-500' checked={canvasStyle === canvasStyleFormats.igStory} onCheckedChange={handleSwitchChange} />
+                <Switch checked={canvasStyle === canvasStyleFormats.igStory} onCheckedChange={handleSwitchChange} />
                 <span className="text-sm">IG Story</span>
             </div>
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-            />
+            <div className="flex flex-col  gap-3 w-[30rem]">
+                <Label htmlFor="picture">Backgroung image</Label>
+                <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="w-full file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
+                />
+            </div>
             <TextControls onAddText={handleAddText} coordinates={relativeObjectCoords} fontSize={selectedTextFontSize} />
             <div key={canvasStyle} ref={canvasContainerRef} className={cn('flex justify-center relative rounded-lg overflow-hidden', canvasStyle)}>
                 <canvas ref={canvasRef} />
