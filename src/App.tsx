@@ -1,5 +1,6 @@
 import './App.css'
 import Canvas from './components/Canvas'
+import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card'
 
 function App() {
   const handleImageUpload = (file: File) => {
@@ -8,9 +9,17 @@ function App() {
   }
 
   return (
-    <div className=' h-full flex flex-col gap-10 dark'>
-      <h1>Flyers Tool</h1>
-      <Canvas onImageUpload={handleImageUpload} />
+    <div className='h-screen w-full flex justify-center dark items-center'>
+      <Card className='p-10 w-[50svw]'>
+        <CardHeader>
+          <CardTitle className='text-center text-4xl'>
+            Flyers Tool
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Canvas onImageUpload={handleImageUpload} />
+        </CardContent>
+      </Card>
     </div>
   )
 }
